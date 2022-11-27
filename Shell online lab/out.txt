@@ -1,0 +1,5 @@
+a.txt
+dir1
+out.txt
+test.sh
+weeeeeee
