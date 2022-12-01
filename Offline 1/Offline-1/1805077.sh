@@ -10,34 +10,44 @@ max_student_id=5
 [[ $# -gt 2 ]] && {
     echo "Invalid number of arguments"
     exit 1
-} || {
-    [[ $# -eq 2 ]] && {
-        max_score=$1
-        [[ $2 =~ [0-9] ]] || {
+} || { 
+    [[ $# -eq 2 ]] && { 
+        [[ $1 =~ ^[0-9] ]] && {
+            max_score=$1
+        } || {
+            echo "Invalid max score"
+            exit 1
+        }
+        [[ $2 =~ [1-9] ]] && {
+            max_student_id=$2
+        } || {
             echo "Invalid max student id"
             exit 1
         }
-        max_student_id=$2
+        
     } || {
         [[ $# -eq 1 ]] && {
-            max_score=$1
+            [[ $1 =~ ^[0-9] ]] && {
+                max_score=$1
+            } || {
+                echo "Invalid max score"
+                exit 1
+            }
         }
     }
 }
 
-# echo $# $max_score $max_student_id
+# necessary temp files
 
 touch temp.txt
 touch output.csv
 echo "student_id,score" > output.csv
 max_student_id=$(( 1805120 + max_student_id ))
-# echo $max_student_id
 
 # for loop for checking the outputs and genereating marks
 
 for student_id in $(seq 1805121 $max_student_id)
 do
-    # echo $student_id
     [[ -d Submissions/"$student_id" ]] && [[ -f Submissions/"$student_id"/"$student_id".sh ]] && {
         [[ -x Submissions/"$student_id"/"$student_id".sh ]] || {
             chmod a+x Submissions/"$student_id"/"$student_id".sh
@@ -52,6 +62,7 @@ do
     }
 done
 
+# copy checker loop(s)
 
 for current_student_id in $(seq 1805121 $max_student_id)
 do
@@ -67,6 +78,8 @@ do
         done
     }
 done
+
+# deletion of remaining temp files
 
 [[ -e temp.txt ]] && {
     rm temp.txt
