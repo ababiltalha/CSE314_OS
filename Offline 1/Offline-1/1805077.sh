@@ -28,8 +28,8 @@ max_student_id=5
 # echo $# $max_score $max_student_id
 
 touch temp.txt
-touch trial.csv
-echo "student_id,score" > trial.csv
+touch output.csv
+echo "student_id,score" > output.csv
 max_student_id=$(( 1805120 + max_student_id ))
 # echo $max_student_id
 
@@ -44,11 +44,11 @@ do
         }
         bash ./Submissions/"$student_id"/"$student_id".sh > out"$student_id".txt
         diff --ignore-all-space out"$student_id".txt AcceptedOutput.txt > temp.txt
-        echo "$student_id,$(( $max_score - 5*( $( grep -c "^[<>]" temp.txt ) ) ))" >> trial.csv
+        echo "$student_id,$(( $max_score - 5*( $( grep -c "^[<>]" temp.txt ) ) ))" >> output.csv
         rm out"$student_id".txt
     } || {
-        echo "Submission format not followed"
-        echo "$student_id,0" >> trial.csv
+        echo "Submission format not followed by $student_id"
+        echo "$student_id,0" >> output.csv
     }
 done
 
@@ -60,7 +60,8 @@ do
         do
             [[ $current_student_id -ne $student_id ]] && [[ -d Submissions/"$student_id" ]] && [[ -f Submissions/"$student_id"/"$student_id".sh ]] && {
             [[ 0 -eq $( diff --ignore-all-space Submissions/"$current_student_id"/"$current_student_id".sh Submissions/"$student_id"/"$student_id".sh | grep -c "^[<>]" ) ]] && {
-                grep --only-matching "$current_student_id" trial.csv | sed 
+                # grep "^$current_student_id," output.csv
+                sed -i "s/^$current_student_id,/$current_student_id,-/g" output.csv
             }
         }
         done
