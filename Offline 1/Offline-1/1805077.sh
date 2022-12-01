@@ -18,7 +18,7 @@ max_student_id=5
             echo "Invalid max score"
             exit 1
         }
-        [[ $2 =~ [1-9] ]] && {
+        [[ $2 =~ ^[1-9] ]] && {
             max_student_id=$2
         } || {
             echo "Invalid max student id"
