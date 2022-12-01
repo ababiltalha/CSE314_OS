@@ -1,25 +1,75 @@
 #!/bin/bash
 
-[[ $# -gt 1 ]] && exit 1
+# default values for score and no of students
 
-if (( $# == 0 ))
-then
-    n=100
-else
-    n=$1
-fi
+max_score=100
+max_student_id=5
 
-touch trial.csv
-touch out.txt
+# checking parameters provided and assigning
+
+[[ $# -gt 2 ]] && {
+    echo "Invalid number of arguments"
+    exit 1
+} || {
+    [[ $# -eq 2 ]] && {
+        max_score=$1
+        [[ $2 =~ [0-9] ]] || {
+            echo "Invalid max student id"
+            exit 1
+        }
+        max_student_id=$2
+    } || {
+        [[ $# -eq 1 ]] && {
+            max_score=$1
+        }
+    }
+}
+
+# echo $# $max_score $max_student_id
+
 touch temp.txt
-./Submissions/1805121/1805121.sh > out.txt
+touch trial.csv
+echo "student_id,score" > trial.csv
+max_student_id=$(( 1805120 + max_student_id ))
+# echo $max_student_id
 
-diff out.txt AcceptedOutput.txt > temp.txt
-firstFile=$( grep -c "^<" temp.txt )
-secondFile=$( grep -c "^>" temp.txt )
-echo 1805121,$((100-5*( $firstFile + $secondFile ) )) >> trial.csv
+# for loop for checking the outputs and genereating marks
+
+for student_id in $(seq 1805121 $max_student_id)
+do
+    # echo $student_id
+    [[ -d Submissions/"$student_id" ]] && [[ -f Submissions/"$student_id"/"$student_id".sh ]] && {
+        [[ -x Submissions/"$student_id"/"$student_id".sh ]] || {
+            chmod a+x Submissions/"$student_id"/"$student_id".sh
+        }
+        bash ./Submissions/"$student_id"/"$student_id".sh > out"$student_id".txt
+        diff --ignore-all-space out"$student_id".txt AcceptedOutput.txt > temp.txt
+        echo "$student_id,$(( $max_score - 5*( $( grep -c "^[<>]" temp.txt ) ) ))" >> trial.csv
+        rm out"$student_id".txt
+    } || {
+        echo "Submission format not followed"
+        echo "$student_id,0" >> trial.csv
+    }
+done
 
 
-echo $n
+for current_student_id in $(seq 1805121 $max_student_id)
+do
+    [[ -d Submissions/"$current_student_id" ]] && [[ -f Submissions/"$current_student_id"/"$current_student_id".sh ]] && {
+        for student_id in $(seq 1805121 $max_student_id)
+        do
+            [[ $current_student_id -ne $student_id ]] && [[ -d Submissions/"$student_id" ]] && [[ -f Submissions/"$student_id"/"$student_id".sh ]] && {
+            [[ 0 -eq $( diff --ignore-all-space Submissions/"$current_student_id"/"$current_student_id".sh Submissions/"$student_id"/"$student_id".sh | grep -c "^[<>]" ) ]] && {
+                grep --only-matching "$current_student_id" trial.csv | sed 
+            }
+        }
+        done
+    }
+done
+
+[[ -e temp.txt ]] && {
+    rm temp.txt
+}
+
 
 
