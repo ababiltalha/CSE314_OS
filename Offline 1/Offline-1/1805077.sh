@@ -75,6 +75,7 @@ do
             [[ 0 -eq $( diff --ignore-all-space Submissions/"$current_student_id"/"$current_student_id".sh Submissions/"$student_id"/"$student_id".sh | grep -c "^[<>]" ) ]] && {
                 # grep "^$current_student_id," output.csv
                 sed -i "s/^$current_student_id,/$current_student_id,-/g" output.csv
+                break
             }
         }
         done
