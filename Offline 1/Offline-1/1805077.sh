@@ -54,7 +54,9 @@ do
         }
         bash ./Submissions/"$student_id"/"$student_id".sh > out"$student_id".txt
         diff --ignore-all-space out"$student_id".txt AcceptedOutput.txt > temp.txt
-        echo "$student_id,$(( $max_score - 5*( $( grep -c "^[<>]" temp.txt ) ) ))" >> output.csv
+        marks=$(( $max_score - 5*( $( grep -c "^[<>]" temp.txt ) ) ))
+        (( $marks < 0 )) && marks=0
+        echo "$student_id,$marks" >> output.csv
         rm out"$student_id".txt
     } || {
         echo "Submission format not followed by $student_id"
